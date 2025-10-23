@@ -1,4 +1,4 @@
-<img width="1024" height="691" alt="image" src="https://github.com/user-attachments/assets/1fcf9ac3-0c97-44c5-b764-6b57bf22139b" /># Enciphered
+# Enciphered
 
 A simple flutter-based password manager mobile application.
 
@@ -29,4 +29,4 @@ Email verification for password recovery.
 Password Generator.
 
 ## Color Pallete
-<img width="1024" height="691" alt="image" src="https://github.com/user-attachments/assets/33549010-0b24-4216-82e0-539f98149771" />
+<img width="512" height="345" alt="image" src="https://github.com/user-attachments/assets/33549010-0b24-4216-82e0-539f98149771" />
