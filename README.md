@@ -1,16 +1,29 @@
-# enciphered_app
+# Enciphered
 
-A new Flutter project.
+A simple flutter-based password manager mobile application.
 
-## Getting Started
+## Tables
+- tbUsers
+  - id int autoincrement
+  - username string
+  - email string
+  - userAuthData string
+    
+- tbPasswords
+  - id int autoincrement
+  - email fk
+  - platformUrl string
+  - platformPassword string
+  - passwordDescription string
+  - created_at date
 
-This project is a starting point for a Flutter application.
+## Login & Register
+When the user registers a new account, the email and loginPassword are hashed, concatenated and stored in SQLite.
+On login, the userAuthData is compared to the loginAuthData. If the hashes match, the user successfully logs in.
 
-A few resources to get you started if this is your first Flutter project:
+## Stored Passwords
+We will encrypt the passwords using [AES](https://stackoverflow.com/questions/70061906/how-to-encrypt-password-while-saving-in-database-in-flutter-sqlite-dart-applicat) for more security.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Ideas
+Email verification for password recovery
+Password Generator
