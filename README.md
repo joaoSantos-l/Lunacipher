@@ -28,11 +28,12 @@ A simple and secure **Flutter-based Password Manager** built with **SQLite** and
 | Column                | Type                      | Description                |
 | :-------------------- | :------------------------ | :------------------------- |
 | `id`                  | `INTEGER (AUTOINCREMENT)` | Unique password entry ID   |
-| `email`               | `TEXT (FK)`               | References `tbUsers.email` |
+| `email`               | `TEXT`               | The email used for the platform register |
 | `platformUrl`         | `TEXT`                    | Platform or website URL   |
 | `platformPassword`    | `TEXT`                    | AES-encrypted password     |
 | `passwordDescription` | `TEXT`                    | Optional description       |
-| `created_at`          | `DATE`                    | Date of creation           |
+| `createdAt`          | `DATE`                    | Date of creation           |
+| `userId`          | `INTEGER (FK)`                    | User reference          |
 
 ---
 
