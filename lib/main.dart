@@ -4,6 +4,34 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/dashboard_screen.dart';
 
+SnackBar showWelcomeSnackbar(BuildContext context) {
+  return SnackBar(
+    content: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Bem-Vindo <username>',
+          style: TextStyle(fontSize: 15, color: Colors.white),
+        ),
+        IconButton(
+          onPressed: ScaffoldMessenger.of(context).hideCurrentSnackBar,
+          icon: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Theme.of(context).colorScheme.secondaryContainer,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.close, color: Colors.white, size: 40),
+            ),
+          ),
+        ),
+      ],
+    ),
+    backgroundColor: Theme.of(context).colorScheme.secondary,
+  );
+}
+
 void main() => runApp(const LunacipherApp());
 
 class LunacipherApp extends StatelessWidget {

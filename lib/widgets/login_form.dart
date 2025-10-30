@@ -1,3 +1,4 @@
+import 'package:enciphered_app/main.dart';
 import 'package:enciphered_app/screens/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
 
   final strongPasswordRegex = RegExp(
-    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{12,}$',
+    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$',
   );
 
   final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w{2,}$');
@@ -77,7 +78,7 @@ class _LoginFormState extends State<LoginForm> {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, digite uma senha';
                       } else if (!strongPasswordRegex.hasMatch(value)) {
-                        return 'Senha deve ter 12+ caracteres, incluir maiúscula e minúscula, número, e símbolo';
+                        return 'Senha deve ter 8+ caracteres, incluir maiúscula e minúscula, número, e símbolo';
                       }
                       return null;
                     },
@@ -89,46 +90,9 @@ class _LoginFormState extends State<LoginForm> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Bem-Vindo <username>',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: ScaffoldMessenger.of(
-                                    context,
-                                  ).hideCurrentSnackBar,
-                                  icon: Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.secondaryContainer,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                        size: 40,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.secondary,
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(showWelcomeSnackbar(context));
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
