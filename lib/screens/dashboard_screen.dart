@@ -1,4 +1,7 @@
+import 'package:enciphered_app/models/password.dart';
+import 'package:enciphered_app/screens/PasswordItem.dart';
 import 'package:enciphered_app/screens/login_screen.dart';
+import 'package:enciphered_app/services/DatabaseHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/add_password_modal.dart';
@@ -11,6 +14,12 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  deletePasswordd(PasswordModel password) {
+    setState(() {
+      DatabaseHelper.instance.removePassword(password.id!);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,8 +77,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
+          FutureBuilder(
+            future: DatabaseHelper.instance.getPasswords(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return snapshot.data!.isEmpty
+                    ? Expanded(
+                      child: const Center(
+                          child: Text('Você não tem nenhuma senha salva', style: TextStyle(fontSize: 18),),
+                        ),
+                    )
+                    : ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          PasswordModel currentPassword =
+                              snapshot.data![snapshot.data!.length - index - 1];
+                          return Passworditem(
+                            password: currentPassword,
+                            deletePassword: () =>
+                                deletePasswordd(currentPassword),
+                          );
+                        },
+                      );
+              } else if (snapshot.hasError) {
+                return Center(child: Text(snapshot.error.toString()));
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
+          ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(

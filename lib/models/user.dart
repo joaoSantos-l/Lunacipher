@@ -27,7 +27,7 @@ class UserModel {
 
   bool verifyHash(String email, String password) {
     String dataToHash = email + password;
-    List<int> bytes = utf8.encode('dataToHash');
+    List<int> bytes = utf8.encode(dataToHash);
 
     Digest digest = sha256.convert(bytes);
     String userLoginData = digest.toString();

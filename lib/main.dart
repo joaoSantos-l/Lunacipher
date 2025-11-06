@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -32,8 +36,20 @@ SnackBar showWelcomeSnackbar(BuildContext context) {
   );
 }
 
-void main() => runApp(const LunacipherApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit(); // Inicializa o FFI
+    databaseFactory = databaseFactoryFfi; // Define a fábrica de banco de dados
+  }
+ 
+ 
+  runApp(const LunacipherApp());
+}
+
+void sqfliteFfiInit() {
+}
 class LunacipherApp extends StatelessWidget {
   const LunacipherApp({super.key});
 
@@ -61,7 +77,7 @@ class LunacipherApp extends StatelessWidget {
           hintStyle: TextStyle(color: Colors.grey.shade400),
         ),
       ),
-      home: const LoginScreen(),
+      home: const DashboardScreen(),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),

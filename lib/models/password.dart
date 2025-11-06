@@ -4,7 +4,7 @@ class PasswordModel {
   int? id;
   int userId;
   String email;
-  String platformUrl;
+  String platformName;
   String platformPassword;
   String? passwordDescription;
   DateTime? createdAt;
@@ -13,7 +13,7 @@ class PasswordModel {
     this.id,
     required this.email,
     this.passwordDescription,
-    required this.platformUrl,
+    required this.platformName,
     this.createdAt,
     required this.platformPassword,
     required this.userId
@@ -43,7 +43,7 @@ class PasswordModel {
     passwordDescription: json['passwordDescription'],
     platformPassword: json['platformPassword'],
     email: json['email'],
-    platformUrl: json['platformUrl'],
+    platformName: json['platformName'],
     createdAt: json['createdAt'],
     userId: json['userId']
   );
@@ -55,7 +55,7 @@ class PasswordModel {
       'platformPassword': platformPassword,
       'email': email,
       'createdAt': createdAt,
-      'platformU': platformPassword,
+      'platformName': platformName,
       'userId': userId
     };
   }
