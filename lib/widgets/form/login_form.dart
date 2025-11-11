@@ -1,6 +1,7 @@
 import 'package:enciphered_app/main.dart';
 import 'package:enciphered_app/models/user.dart';
 import 'package:enciphered_app/services/database_helper.dart';
+import 'package:enciphered_app/widgets/components/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class LoginForm extends StatefulWidget {
@@ -67,22 +68,11 @@ class _LoginFormState extends State<LoginForm> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: TextFormField(
+                  child: CustomFormField(
                     controller: _emailController,
-                    style: const TextStyle(color: Colors.white),
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      hintText: 'exemplo@dominio.com',
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        color: Colors.white70,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintStyle: TextStyle(color: Colors.grey.shade500),
-                    ),
+                    fieldType: FieldType.email,
+                    label: 'Email',
+                    hint: 'exemplo@dominio.com',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, digite seu email';
@@ -96,22 +86,11 @@ class _LoginFormState extends State<LoginForm> {
 
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: TextFormField(
+                  child: CustomFormField(
                     controller: _passwordController,
-                    style: const TextStyle(color: Colors.white),
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      hintText: 'Senha segura',
-                      prefixIcon: const Icon(
-                        Icons.lock_outline,
-                        color: Colors.white70,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintStyle: TextStyle(color: Colors.grey.shade500),
-                    ),
+                    fieldType: FieldType.password,
+                    label: 'Senha',
+                    hint: 'Senha segura',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, digite uma senha';

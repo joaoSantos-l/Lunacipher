@@ -1,4 +1,6 @@
 import 'package:enciphered_app/models/password.dart';
+import 'package:enciphered_app/services/database_helper.dart';
+import 'package:enciphered_app/widgets/password/password_modal.dart';
 import 'package:flutter/material.dart';
 
 class Passworditem extends StatefulWidget {
@@ -50,6 +52,66 @@ class _PassworditemState extends State<Passworditem> {
               ? Text(widget.password.passwordDescription!)
               : null,
           tileColor: Theme.of(context).colorScheme.secondaryContainer,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white),
+                onPressed: () async {
+                  final updatedPassword = await showDialog<PasswordModel>(
+                    context: context,
+                    builder: (context) =>
+                        AddPasswordModal(password: widget.password),
+                  );
+
+                  if (updatedPassword != null) {
+                    await DatabaseHelper.instance.updatePassword(
+                      updatedPassword,
+                    );
+                    setState(() {});
+                  }
+                },
+              ),
+
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Excluir Senha'),
+                      content: const Text(
+                        'Tem certeza que deseja excluir esta senha?',
+                      ),
+                      actions: [
+                        TextButton(
+                          child: const Text('Cancelar'),
+                          onPressed: () => Navigator.pop(context, false),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                          ),
+                          child: const Text('Excluir'),
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    widget.deletePassword();
+                  }
+                },
+              ),
+            ],
+          ),
+          onTap: () {
+            showDialog<PasswordModel>(
+              context: context,
+              builder: (context) => AddPasswordModal(password: widget.password),
+            );
+          },
         ),
       ),
     );

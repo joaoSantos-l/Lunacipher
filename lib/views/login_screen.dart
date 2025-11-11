@@ -1,7 +1,7 @@
 import 'package:enciphered_app/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../widgets/login_form.dart';
+import '../widgets/form/login_form.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

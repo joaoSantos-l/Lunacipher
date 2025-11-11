@@ -14,10 +14,10 @@ class PasswordModel {
     required this.email,
     this.passwordDescription,
     required this.platformName,
-    this.createdAt,
     required this.platformPassword,
     required this.userId,
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   void encrypt(String inputPassword) {
     platformPassword = SecurityService.encryptPassword(inputPassword);
@@ -33,7 +33,9 @@ class PasswordModel {
     platformPassword: json['platformPassword'],
     email: json['email'],
     platformName: json['platformName'],
-    createdAt: json['createdAt'],
+    createdAt: json['createdAt'] != null
+        ? DateTime.parse(json['createdAt'])
+        : null,
     userId: json['userId'],
   );
 
@@ -43,7 +45,7 @@ class PasswordModel {
       'passwordDescription': passwordDescription,
       'platformPassword': platformPassword,
       'email': email,
-      'createdAt': createdAt,
+      'createdAt': createdAt?.toIso8601String(),
       'platformName': platformName,
       'userId': userId,
     };

@@ -1,5 +1,6 @@
 import 'package:enciphered_app/models/user.dart';
 import 'package:enciphered_app/services/database_helper.dart';
+import 'package:enciphered_app/widgets/components/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -49,6 +50,7 @@ class _RegisterForm extends State<RegisterForm> {
             backgroundColor: Colors.green,
           ),
         );
+        Navigator.pushReplacementNamed(context, '/login');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -73,20 +75,10 @@ class _RegisterForm extends State<RegisterForm> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextFormField(
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Nome de usuário',
-                    prefixIcon: const Icon(
-                      Icons.person_outline,
-                      color: Colors.white70,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
-                  ),
+                CustomFormField(
+                  controller: _usernameController,
+                  fieldType: FieldType.username,
+                  label: 'Username',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, digite um nome de usuário';
@@ -99,22 +91,10 @@ class _RegisterForm extends State<RegisterForm> {
 
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: TextFormField(
+                  child: CustomFormField(
                     controller: _emailController,
-                    style: const TextStyle(color: Colors.white),
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      hintText: 'exemplo@dominio.com',
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        color: Colors.white70,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintStyle: TextStyle(color: Colors.grey.shade500),
-                    ),
+                    fieldType: FieldType.email,
+                    label: 'Email',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, digite seu email';
@@ -128,22 +108,10 @@ class _RegisterForm extends State<RegisterForm> {
 
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
-                  child: TextFormField(
+                  child: CustomFormField(
                     controller: _passwordController,
-                    style: const TextStyle(color: Colors.white),
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      hintText: 'Senha segura',
-                      prefixIcon: const Icon(
-                        Icons.lock_outline,
-                        color: Colors.white70,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintStyle: TextStyle(color: Colors.grey.shade500),
-                    ),
+                    fieldType: FieldType.password,
+                    label: 'Senha',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, digite uma senha';

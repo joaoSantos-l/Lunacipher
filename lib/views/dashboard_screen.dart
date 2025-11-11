@@ -4,7 +4,7 @@ import 'package:enciphered_app/views/login_screen.dart';
 import 'package:enciphered_app/services/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../widgets/add_password_modal.dart';
+import '../widgets/password/password_modal.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -78,7 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           FutureBuilder(
-            future: DatabaseHelper.instance.getPasswords(),
+            future: DatabaseHelper.instance.getPasswordsByUserId(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return snapshot.data!.isEmpty
@@ -90,17 +90,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                       )
-                    : ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          PasswordModel currentPassword =
-                              snapshot.data![snapshot.data!.length - index - 1];
-                          return Passworditem(
-                            password: currentPassword,
-                            deletePassword: () =>
-                                deletePasswordd(currentPassword),
-                          );
-                        },
+                    : Expanded(
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            PasswordModel currentPassword = snapshot
+                                .data![snapshot.data!.length - index - 1];
+                            return Passworditem(
+                              password: currentPassword,
+                              deletePassword: () =>
+                                  deletePasswordd(currentPassword),
+                            );
+                          },
+                        ),
                       );
               } else if (snapshot.hasError) {
                 return Center(child: Text(snapshot.error.toString()));
@@ -111,13 +113,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
+        onPressed: () async {
+          final newPassword = await showDialog<PasswordModel>(
             context: context,
-            builder: (context) => const AddPasswordModal(),
+            builder: (context) => AddPasswordModal(),
           );
+
+          if (newPassword != null) {
+            await DatabaseHelper.instance.addPassword(
+              newPassword,
+              newPassword.platformPassword,
+            );
+            setState(() {});
+          }
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add, color: Colors.white),

@@ -1,6 +1,7 @@
 import 'package:enciphered_app/models/password.dart';
 import 'package:enciphered_app/models/user.dart';
 import 'package:enciphered_app/services/security_service.dart';
+import 'package:enciphered_app/services/session_manager.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io';
@@ -42,7 +43,7 @@ class DatabaseHelper {
     platformPassword TEXT NOT NULL,
     platformName TEXT NOT NULL,
     passwordDescription TEXT,
-    createdAt DATE
+    createdAt DATE,
     userId INTEGER NOT NULL,
 
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
@@ -50,9 +51,15 @@ class DatabaseHelper {
     ''');
   }
 
-  Future<List<PasswordModel>> getPasswords() async {
+  Future<List<PasswordModel>> getPasswordsByUserId() async {
+    final userId = await SessionManager.getCurrentUserId();
     Database db = await instance.database;
-    var passwords = await db.query('passwords', orderBy: 'id DESC');
+    var passwords = await db.query(
+      'passwords',
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'id DESC',
+    );
     List<PasswordModel> passwordList = passwords.isNotEmpty
         ? passwords.map((item) => PasswordModel.fromMap(item)).toList()
         : [];
@@ -75,6 +82,11 @@ class DatabaseHelper {
 
   Future<int> updatePassword(PasswordModel password) async {
     Database db = await instance.database;
+
+    if (!password.platformPassword.contains(':')) {
+      password.encrypt(password.platformPassword);
+    }
+
     return await db.update(
       'passwords',
       password.toMap(),
@@ -105,6 +117,7 @@ class DatabaseHelper {
     UserModel? user = await getUserByEmail(email);
     if (user != null &&
         SecurityService.verifyAuthHash(email, password, user.userAuthData)) {
+      await SessionManager.saveCurrenteUser(user);
       return user;
     }
     return null;
