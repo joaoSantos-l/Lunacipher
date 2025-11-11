@@ -1,5 +1,6 @@
 import 'package:enciphered_app/models/password.dart';
 import 'package:enciphered_app/models/user.dart';
+import 'package:enciphered_app/services/security_service.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io';
@@ -58,7 +59,11 @@ class DatabaseHelper {
     return passwordList;
   }
 
-  Future<int> addPassword(PasswordModel newPassword) async {
+  Future<int> addPassword(
+    PasswordModel newPassword,
+    String plainPassword,
+  ) async {
+    newPassword.encrypt(plainPassword);
     Database db = await instance.database;
     return await db.insert('passwords', newPassword.toMap());
   }
@@ -87,7 +92,29 @@ class DatabaseHelper {
     return userList;
   }
 
-  Future<int> addUser(UserModel newUser) async {
+  Future<UserModel?> getUserByEmail(String email) async {
+    Database db = await instance.database;
+    var users = await db.query('users', where: 'email = ?', whereArgs: [email]);
+    if (users.isNotEmpty) {
+      return UserModel.fromMap(users.first);
+    }
+    return null;
+  }
+
+  Future<UserModel?> login(String email, String password) async {
+    UserModel? user = await getUserByEmail(email);
+    if (user != null &&
+        SecurityService.verifyAuthHash(email, password, user.userAuthData)) {
+      return user;
+    }
+    return null;
+  }
+
+  Future<int> addUser(UserModel newUser, String password) async {
+    newUser.userAuthData = SecurityService.hashAuthData(
+      newUser.email,
+      password,
+    );
     Database db = await instance.database;
     return await db.insert('users', newUser.toMap());
   }

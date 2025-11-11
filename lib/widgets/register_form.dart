@@ -1,3 +1,5 @@
+import 'package:enciphered_app/models/user.dart';
+import 'package:enciphered_app/services/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -9,12 +11,56 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterForm extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   final strongPasswordRegex = RegExp(
-    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{12,}$',
+    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$',
   );
 
   final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w{2,}$');
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _register() async {
+    if (_formKey.currentState!.validate()) {
+      final username = _usernameController.text;
+      final email = _emailController.text;
+      final password = _passwordController.text;
+
+      final newUser = UserModel(
+        email: email,
+        username: username,
+        userAuthData: '',
+      );
+
+      final id = await DatabaseHelper.instance.addUser(newUser, password);
+      if (id > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Usuário registrado com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Erro ao registrar usuário. O email pode já estar em uso.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +100,7 @@ class _RegisterForm extends State<RegisterForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: TextFormField(
+                    controller: _emailController,
                     style: const TextStyle(color: Colors.white),
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
@@ -82,6 +129,7 @@ class _RegisterForm extends State<RegisterForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: TextFormField(
+                    controller: _passwordController,
                     style: const TextStyle(color: Colors.white),
                     obscureText: true,
                     decoration: InputDecoration(
@@ -100,7 +148,7 @@ class _RegisterForm extends State<RegisterForm> {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, digite uma senha';
                       } else if (!strongPasswordRegex.hasMatch(value)) {
-                        return 'Senha deve ter 12+ caracteres, incluir maiúscula e minúscula, número, e símbolo';
+                        return 'Senha deve ter 8+ caracteres, incluir maiúscula e minúscula, número, e símbolo';
                       }
                       return null;
                     },
@@ -110,48 +158,7 @@ class _RegisterForm extends State<RegisterForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: 30),
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Bem-Vindo <username>',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: ScaffoldMessenger.of(
-                                    context,
-                                  ).hideCurrentSnackBar,
-                                  icon: Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Theme.of(context).colorScheme.secondaryContainer
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                        size: 40,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.secondary,
-                          ),
-                        );
-                      } else {}
-                    },
+                    onPressed: _register,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       minimumSize: const Size(double.infinity, 55),

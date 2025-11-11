@@ -1,4 +1,4 @@
-import 'package:encrypt/encrypt.dart';
+import 'package:enciphered_app/services/security_service.dart';
 
 class PasswordModel {
   int? id;
@@ -16,26 +16,15 @@ class PasswordModel {
     required this.platformName,
     this.createdAt,
     required this.platformPassword,
-    required this.userId
+    required this.userId,
   });
 
-  Encrypter initEncrypter() {
-  final key = Key.fromSecureRandom(32);
-
-    final encrypter = Encrypter(AES(key));
-
-    return encrypter;
-  }
-
   void encrypt(String inputPassword) {
-    
-    final encrypted = initEncrypter().encrypt(inputPassword, iv: IV.fromSecureRandom(16));
-    platformPassword = encrypted.base16;
+    platformPassword = SecurityService.encryptPassword(inputPassword);
   }
 
-  String decrypt(){
-    final decrypted = initEncrypter().decrypt16(platformPassword);
-    return decrypted;
+  String decrypt() {
+    return SecurityService.decryptPassword(platformPassword);
   }
 
   factory PasswordModel.fromMap(Map<String, dynamic> json) => PasswordModel(
@@ -45,7 +34,7 @@ class PasswordModel {
     email: json['email'],
     platformName: json['platformName'],
     createdAt: json['createdAt'],
-    userId: json['userId']
+    userId: json['userId'],
   );
 
   Map<String, dynamic> toMap() {
@@ -56,7 +45,7 @@ class PasswordModel {
       'email': email,
       'createdAt': createdAt,
       'platformName': platformName,
-      'userId': userId
+      'userId': userId,
     };
   }
 }

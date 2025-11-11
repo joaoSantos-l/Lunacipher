@@ -1,5 +1,6 @@
 import 'package:enciphered_app/main.dart';
-import 'package:enciphered_app/screens/dashboard_screen.dart';
+import 'package:enciphered_app/models/user.dart';
+import 'package:enciphered_app/services/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class LoginForm extends StatefulWidget {
@@ -11,12 +12,47 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   final strongPasswordRegex = RegExp(
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$',
   );
 
   final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w{2,}$');
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      final email = _emailController.text;
+      final password = _passwordController.text;
+
+      final UserModel? user = await DatabaseHelper.instance.login(
+        email,
+        password,
+      );
+
+      if (user != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(showWelcomeSnackbar(context, user.username));
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Email ou senha inválidos.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +68,7 @@ class _LoginFormState extends State<LoginForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: TextFormField(
+                    controller: _emailController,
                     style: const TextStyle(color: Colors.white),
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
@@ -60,6 +97,7 @@ class _LoginFormState extends State<LoginForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: TextFormField(
+                    controller: _passwordController,
                     style: const TextStyle(color: Colors.white),
                     obscureText: true,
                     decoration: InputDecoration(
@@ -88,19 +126,7 @@ class _LoginFormState extends State<LoginForm> {
                 Padding(
                   padding: const EdgeInsets.only(top: 30),
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(showWelcomeSnackbar(context));
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DashboardScreen(),
-                          ),
-                        );
-                      } else {}
-                    },
+                    onPressed: _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       minimumSize: const Size(double.infinity, 55),

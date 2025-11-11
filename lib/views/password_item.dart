@@ -16,6 +16,27 @@ class Passworditem extends StatefulWidget {
 }
 
 class _PassworditemState extends State<Passworditem> {
+  // ignore: unused_field
+  bool _isPasswordVisible = false;
+  // ignore: unused_field
+  late String _decryptedPassword;
+
+  @override
+  void initState() {
+    super.initState();
+    _decryptedPassword = widget.password.decrypt();
+  }
+
+  // ignore: unused_element
+  void _copyPassword() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Senha copiada para a área de trasnferência.'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -25,7 +46,9 @@ class _PassworditemState extends State<Passworditem> {
         child: ListTile(
           leading: const Icon(Icons.abc),
           title: Text(widget.password.platformName),
-          subtitle: widget.password.passwordDescription!.isNotEmpty ? Text(widget.password.passwordDescription!) : null,
+          subtitle: widget.password.passwordDescription!.isNotEmpty
+              ? Text(widget.password.passwordDescription!)
+              : null,
           tileColor: Theme.of(context).colorScheme.secondaryContainer,
         ),
       ),

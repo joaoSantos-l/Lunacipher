@@ -1,7 +1,7 @@
 import 'package:enciphered_app/models/password.dart';
-import 'package:enciphered_app/screens/PasswordItem.dart';
-import 'package:enciphered_app/screens/login_screen.dart';
-import 'package:enciphered_app/services/DatabaseHelper.dart';
+import 'package:enciphered_app/views/password_item.dart';
+import 'package:enciphered_app/views/login_screen.dart';
+import 'package:enciphered_app/services/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/add_password_modal.dart';
@@ -83,10 +83,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (snapshot.hasData) {
                 return snapshot.data!.isEmpty
                     ? Expanded(
-                      child: const Center(
-                          child: Text('Você não tem nenhuma senha salva', style: TextStyle(fontSize: 18),),
+                        child: const Center(
+                          child: Text(
+                            'Você não tem nenhuma senha salva',
+                            style: TextStyle(fontSize: 18),
+                          ),
                         ),
-                    )
+                      )
                     : ListView.builder(
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {

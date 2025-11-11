@@ -1,4 +1,4 @@
-import 'package:enciphered_app/screens/register_screen.dart';
+import 'package:enciphered_app/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/login_form.dart';
@@ -14,10 +14,7 @@ class LoginScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF0A0F1F),
-              Color(0xFF1A1F2F),
-            ],
+            colors: [Color(0xFF0A0F1F), Color(0xFF1A1F2F)],
           ),
         ),
         child: Column(
@@ -53,12 +50,12 @@ class LoginScreen extends StatelessWidget {
                             color: Colors.grey.shade400,
                           ),
                         ),
-                        
+
                         Padding(
                           padding: const EdgeInsets.only(top: 40.0),
                           child: LoginForm(),
                         ),
-                        
+
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0),
                           child: Row(
@@ -66,9 +63,7 @@ class LoginScreen extends StatelessWidget {
                             children: [
                               Text(
                                 'Não tem uma conta?',
-                                style: TextStyle(
-                                  color: Colors.grey.shade400,
-                                ),
+                                style: TextStyle(color: Colors.grey.shade400),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
@@ -77,14 +72,17 @@ class LoginScreen extends StatelessWidget {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const RegisterScreen(),
+                                        builder: (context) =>
+                                            const RegisterScreen(),
                                       ),
                                     );
                                   },
                                   child: Text(
                                     'Registre-se',
                                     style: TextStyle(
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

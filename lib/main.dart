@@ -1,20 +1,19 @@
 import 'dart:io';
 
+import 'package:enciphered_app/views/dashboard_screen.dart';
+import 'package:enciphered_app/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/dashboard_screen.dart';
+import 'views/login_screen.dart';
 
-SnackBar showWelcomeSnackbar(BuildContext context) {
+SnackBar showWelcomeSnackbar(BuildContext context, String username) {
   return SnackBar(
     content: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Bem-Vindo <username>',
+          'Bem-Vindo $username',
           style: TextStyle(fontSize: 15, color: Colors.white),
         ),
         IconButton(
@@ -36,20 +35,17 @@ SnackBar showWelcomeSnackbar(BuildContext context) {
   );
 }
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit(); // Inicializa o FFI
     databaseFactory = databaseFactoryFfi; // Define a fábrica de banco de dados
   }
- 
- 
+
   runApp(const LunacipherApp());
 }
 
-void sqfliteFfiInit() {
-}
 class LunacipherApp extends StatelessWidget {
   const LunacipherApp({super.key});
 
@@ -77,7 +73,7 @@ class LunacipherApp extends StatelessWidget {
           hintStyle: TextStyle(color: Colors.grey.shade400),
         ),
       ),
-      home: const DashboardScreen(),
+      home: const LoginScreen(),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
