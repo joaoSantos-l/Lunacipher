@@ -42,22 +42,20 @@ class _RegisterForm extends State<RegisterForm> {
         userAuthData: '',
       );
 
-      final id = await DatabaseHelper.instance.addUser(newUser, password);
-      if (id > 0) {
+      final result = await DatabaseHelper.instance.addUser(newUser, password);
+
+      if (result == -1) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Usuário registrado com sucesso!'),
-            backgroundColor: Colors.green,
+            content: Text('Este e-mail já está registrado.'),
+            backgroundColor: Colors.redAccent,
           ),
         );
-        Navigator.pushReplacementNamed(context, '/login');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Erro ao registrar usuário. O email pode já estar em uso.',
-            ),
-            backgroundColor: Colors.red,
+            content: Text('Conta criada com sucesso!'),
+            backgroundColor: Colors.green,
           ),
         );
       }

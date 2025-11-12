@@ -20,8 +20,9 @@ class DatabaseHelper {
   static const String _dbName = "lunacipher_db.db";
 
   Future<Database> _initDatabase() async {
-    Directory documentDiretory = await getApplicationDocumentsDirectory();
-    String path = join(documentDiretory.path, _dbName);
+    Directory documentDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentDirectory.path, _dbName);
+    print('🗄️ Database path resolved to: $path');
     return openDatabase(path, onCreate: _createDb, version: _version);
   }
 
@@ -129,7 +130,15 @@ class DatabaseHelper {
       password,
     );
     Database db = await instance.database;
-    return await db.insert('users', newUser.toMap());
+
+    try {
+      return await db.insert('users', newUser.toMap());
+    } on DatabaseException catch (e) {
+      if (e.isUniqueConstraintError()) {
+        return -1;
+      }
+      rethrow;
+    }
   }
 
   Future<int> removeUser(int id) async {

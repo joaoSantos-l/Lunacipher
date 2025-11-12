@@ -18,16 +18,7 @@ SnackBar showWelcomeSnackbar(BuildContext context, String username) {
         ),
         IconButton(
           onPressed: ScaffoldMessenger.of(context).hideCurrentSnackBar,
-          icon: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.secondaryContainer,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.close, color: Colors.white, size: 40),
-            ),
-          ),
+          icon: Icon(Icons.close, color: Colors.white, size: 30),
         ),
       ],
     ),
@@ -62,6 +53,7 @@ class LunacipherApp extends StatelessWidget {
           primary: Color(0xFF3A5BA0),
           secondary: Color(0xFF4C7DD1),
           secondaryContainer: Color.fromARGB(255, 68, 118, 203),
+          tertiaryContainer: Color.fromARGB(255, 15, 21, 42),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,

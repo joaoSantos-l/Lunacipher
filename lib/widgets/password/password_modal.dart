@@ -49,15 +49,18 @@ class _AddPasswordModalState extends State<AddPasswordModal> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Erro: usuário não autenticado...'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.redAccent,
           ),
         );
         return;
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Salvando...")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Salvando..."),
+          backgroundColor: Colors.green,
+        ),
+      );
 
       if (widget.password == null) {
         final newPassword = PasswordModel(

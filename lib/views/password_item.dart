@@ -2,15 +2,20 @@ import 'package:enciphered_app/models/password.dart';
 import 'package:enciphered_app/services/database_helper.dart';
 import 'package:enciphered_app/widgets/password/password_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Passworditem extends StatefulWidget {
   final PasswordModel password;
   final Function() deletePassword;
+  final int index;
+  final int totalCount;
 
   const Passworditem({
     super.key,
     required this.password,
     required this.deletePassword,
+    required this.index,
+    required this.totalCount,
   });
 
   @override
@@ -18,9 +23,6 @@ class Passworditem extends StatefulWidget {
 }
 
 class _PassworditemState extends State<Passworditem> {
-  // ignore: unused_field
-  bool _isPasswordVisible = false;
-  // ignore: unused_field
   late String _decryptedPassword;
 
   @override
@@ -29,11 +31,11 @@ class _PassworditemState extends State<Passworditem> {
     _decryptedPassword = widget.password.decrypt();
   }
 
-  // ignore: unused_element
   void _copyPassword() {
+    Clipboard.setData(ClipboardData(text: _decryptedPassword));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Senha copiada para a área de trasnferência.'),
+        content: Text('Senha copiada para a área de transferência.'),
         backgroundColor: Colors.green,
       ),
     );
@@ -41,77 +43,118 @@ class _PassworditemState extends State<Passworditem> {
 
   @override
   Widget build(BuildContext context) {
+    BorderRadiusGeometry customBorderRadius;
+
+    if (widget.index == 0 && widget.index == widget.totalCount - 1) {
+      customBorderRadius = BorderRadius.circular(20);
+    } else if (widget.index == 0) {
+      customBorderRadius = const BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+      );
+    } else if (widget.index == widget.totalCount - 1) {
+      customBorderRadius = const BorderRadius.only(
+        bottomLeft: Radius.circular(20),
+        bottomRight: Radius.circular(20),
+      );
+    } else {
+      customBorderRadius = BorderRadius.zero;
+    }
+
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListTile(
-          leading: const Icon(Icons.abc),
-          title: Text(widget.password.platformName),
-          subtitle: widget.password.passwordDescription!.isNotEmpty
-              ? Text(widget.password.passwordDescription!)
-              : null,
-          tileColor: Theme.of(context).colorScheme.secondaryContainer,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.white),
-                onPressed: () async {
-                  final updatedPassword = await showDialog<PasswordModel>(
-                    context: context,
-                    builder: (context) =>
-                        AddPasswordModal(password: widget.password),
-                  );
-
-                  if (updatedPassword != null) {
-                    await DatabaseHelper.instance.updatePassword(
-                      updatedPassword,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ClipRRect(
+        borderRadius: customBorderRadius,
+        child: Material(
+          child: ListTile(
+            minTileHeight: 80,
+            leading: const Icon(
+              Icons.text_snippet,
+              color: Color.fromARGB(179, 228, 204, 204),
+            ),
+            title: Text(
+              widget.password.platformName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            tileColor: Theme.of(context).colorScheme.tertiaryContainer,
+            subtitle: widget.password.passwordDescription != null
+                ? Text(
+                    widget.password.passwordDescription!,
+                    style: const TextStyle(color: Colors.white70),
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : null,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.copy, size: 18, color: Colors.white54),
+                  onPressed: _copyPassword,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white70),
+                  onPressed: () async {
+                    final updatedPassword = await showDialog<PasswordModel>(
+                      context: context,
+                      builder: (context) =>
+                          AddPasswordModal(password: widget.password),
                     );
-                    setState(() {});
-                  }
-                },
-              ),
 
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Excluir Senha'),
-                      content: const Text(
-                        'Tem certeza que deseja excluir esta senha?',
-                      ),
-                      actions: [
-                        TextButton(
-                          child: const Text('Cancelar'),
-                          onPressed: () => Navigator.pop(context, false),
+                    if (updatedPassword != null) {
+                      await DatabaseHelper.instance.updatePassword(
+                        updatedPassword,
+                      );
+                      setState(() {});
+                    }
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent,
+                  ),
+                  onPressed: () async {
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Excluir Senha'),
+                        content: const Text(
+                          'Tem certeza que deseja excluir esta senha?',
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.redAccent,
+                        actions: [
+                          TextButton(
+                            child: const Text('Cancelar'),
+                            onPressed: () => Navigator.pop(context, false),
                           ),
-                          child: const Text('Excluir'),
-                          onPressed: () => Navigator.pop(context, true),
-                        ),
-                      ],
-                    ),
-                  );
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                            ),
+                            child: const Text('Excluir'),
+                            onPressed: () => Navigator.pop(context, true),
+                          ),
+                        ],
+                      ),
+                    );
 
-                  if (confirm == true) {
-                    widget.deletePassword();
-                  }
-                },
-              ),
-            ],
+                    if (confirm == true) {
+                      widget.deletePassword();
+                    }
+                  },
+                ),
+              ],
+            ),
+            onTap: () {
+              showDialog<PasswordModel>(
+                context: context,
+                builder: (context) =>
+                    AddPasswordModal(password: widget.password),
+              );
+            },
           ),
-          onTap: () {
-            showDialog<PasswordModel>(
-              context: context,
-              builder: (context) => AddPasswordModal(password: widget.password),
-            );
-          },
         ),
       ),
     );

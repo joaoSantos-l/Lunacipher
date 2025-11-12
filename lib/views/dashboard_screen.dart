@@ -1,3 +1,4 @@
+import 'package:enciphered_app/main.dart';
 import 'package:enciphered_app/models/password.dart';
 import 'package:enciphered_app/views/password_item.dart';
 import 'package:enciphered_app/views/login_screen.dart';
@@ -46,6 +47,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       body: Column(
         children: [
+          IconButton(
+            onPressed: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(showWelcomeSnackbar(context, 'teste'));
+            },
+            icon: Icon(Icons.data_object_sharp),
+          ),
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(20),
@@ -77,21 +86,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
-          FutureBuilder(
-            future: DatabaseHelper.instance.getPasswordsByUserId(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return snapshot.data!.isEmpty
-                    ? Expanded(
-                        child: const Center(
+          SizedBox(height: 20),
+          Expanded(
+            child: FutureBuilder(
+              future: DatabaseHelper.instance.getPasswordsByUserId(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data!.isEmpty
+                      ? const Center(
                           child: Text(
                             'Você não tem nenhuma senha salva',
                             style: TextStyle(fontSize: 18),
                           ),
-                        ),
-                      )
-                    : Expanded(
-                        child: ListView.builder(
+                        )
+                      : ListView.separated(
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             PasswordModel currentPassword = snapshot
@@ -100,16 +108,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               password: currentPassword,
                               deletePassword: () =>
                                   deletePasswordd(currentPassword),
+                              index: index,
+                              totalCount: snapshot.data!.length,
                             );
                           },
-                        ),
-                      );
-              } else if (snapshot.hasError) {
-                return Center(child: Text(snapshot.error.toString()));
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
+                          separatorBuilder: (context, index) => const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: Color.fromARGB(255, 133, 135, 146),
+                            ),
+                          ),
+                        );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text(snapshot.error.toString()));
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              },
+            ),
           ),
         ],
       ),
