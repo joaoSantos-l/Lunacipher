@@ -1,8 +1,8 @@
-import 'package:enciphered_app/main.dart';
 import 'package:enciphered_app/models/password.dart';
-import 'package:enciphered_app/views/password_item.dart';
-import 'package:enciphered_app/views/login_screen.dart';
+import 'package:enciphered_app/services/session_manager.dart';
+import 'package:enciphered_app/widgets/password/password_item.dart';
 import 'package:enciphered_app/services/database_helper.dart';
+import 'package:enciphered_app/widgets/components/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/password/password_modal.dart';
@@ -15,6 +15,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  String _searchQuery = '';
+
   deletePasswordd(PasswordModel password) {
     setState(() {
       DatabaseHelper.instance.removePassword(password.id!);
@@ -34,27 +36,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.exit_to_app, color: Colors.white70),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
-            },
+          Row(
+            children: [
+              IconButton(onPressed: () {}, icon: Icon(Icons.person)),
+              SizedBox(width: 10),
+              IconButton(
+                icon: const Icon(Icons.exit_to_app, color: Colors.redAccent),
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Fazer Logout'),
+                      content: const Text(
+                        'Tem certeza que deseja fazer logout?',
+                      ),
+                      actions: [
+                        TextButton(
+                          child: const Text('Cancelar'),
+                          onPressed: () => Navigator.pop(context, false),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                          ),
+                          child: const Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    SessionManager.logout();
+                    Navigator.pushReplacementNamed(context, '/login');
+                  }
+                },
+              ),
+              SizedBox(width: 10),
+            ],
           ),
         ],
       ),
       body: Column(
         children: [
-          IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(showWelcomeSnackbar(context, 'teste'));
-            },
-            icon: Icon(Icons.data_object_sharp),
-          ),
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(20),
@@ -83,13 +110,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: GoogleFonts.poppins(color: Colors.white70),
                   ),
                 ),
+                SizedBox(height: 20),
+                SearchBarWidget(
+                  onSearch: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+
+                  onClear: () {
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                  },
+                ),
               ],
             ),
           ),
           SizedBox(height: 20),
           Expanded(
             child: FutureBuilder(
-              future: DatabaseHelper.instance.getPasswordsByUserId(),
+              future: DatabaseHelper.instance.getPasswordsByUserId(
+                filter: _searchQuery,
+              ),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return snapshot.data!.isEmpty
@@ -102,8 +145,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       : ListView.separated(
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
-                            PasswordModel currentPassword = snapshot
-                                .data![snapshot.data!.length - index - 1];
+                            PasswordModel currentPassword =
+                                snapshot.data![index];
                             return Passworditem(
                               password: currentPassword,
                               deletePassword: () =>

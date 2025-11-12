@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum FieldType { username, email, password }
+enum FieldType { username, email, password, platform, description }
 
 class CustomFormField extends StatefulWidget {
   final TextEditingController controller;
@@ -37,6 +37,10 @@ class _CustomFormFieldState extends State<CustomFormField> {
         return Icons.email_outlined;
       case FieldType.password:
         return Icons.lock_outline;
+      case FieldType.platform:
+        return Icons.link_rounded;
+      case FieldType.description:
+        return Icons.description_outlined;
     }
   }
 
@@ -48,6 +52,10 @@ class _CustomFormFieldState extends State<CustomFormField> {
         return TextInputType.emailAddress;
       case FieldType.password:
         return TextInputType.visiblePassword;
+      case FieldType.platform:
+        return TextInputType.text;
+      case FieldType.description:
+        return TextInputType.text;
     }
   }
 

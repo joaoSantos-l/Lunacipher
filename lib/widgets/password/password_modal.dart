@@ -1,4 +1,8 @@
+import 'package:enciphered_app/services/enum_mapper.dart';
 import 'package:enciphered_app/services/session_manager.dart';
+import 'package:enciphered_app/services/string_extension.dart';
+import 'package:enciphered_app/widgets/components/custom_text_field.dart';
+import 'package:enciphered_app/widgets/enums/platform_type.dart';
 import 'package:flutter/material.dart';
 import 'package:enciphered_app/models/password.dart';
 
@@ -13,6 +17,7 @@ class AddPasswordModal extends StatefulWidget {
 
 class _AddPasswordModalState extends State<AddPasswordModal> {
   final _formKey = GlobalKey<FormState>();
+  PlatformType _selectedPlatform = PlatformType.other;
 
   final _passwordController = TextEditingController();
   final _passwordEmailController = TextEditingController();
@@ -27,8 +32,8 @@ class _AddPasswordModalState extends State<AddPasswordModal> {
       _passwordEmailController.text = widget.password!.email;
       _passwordDescriptionController.text =
           widget.password!.passwordDescription ?? '';
-
       _passwordController.text = widget.password!.decrypt();
+      _selectedPlatform = widget.password!.platformType;
     }
   }
 
@@ -44,7 +49,6 @@ class _AddPasswordModalState extends State<AddPasswordModal> {
   void _savePassword() async {
     if (_formKey.currentState!.validate()) {
       final userId = await SessionManager.getCurrentUserId();
-
       if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -69,6 +73,7 @@ class _AddPasswordModalState extends State<AddPasswordModal> {
           platformPassword: _passwordController.text.trim(),
           passwordDescription: _passwordDescriptionController.text.trim(),
           userId: userId,
+          platformType: _selectedPlatform,
         );
         Navigator.pop(context, newPassword);
       } else {
@@ -76,8 +81,8 @@ class _AddPasswordModalState extends State<AddPasswordModal> {
           ..platformName = _passwordUrlController.text.trim()
           ..platformPassword = _passwordController.text.trim()
           ..email = _passwordEmailController.text.trim()
-          ..passwordDescription = _passwordDescriptionController.text.trim();
-
+          ..passwordDescription = _passwordDescriptionController.text.trim()
+          ..platformType = _selectedPlatform;
         Navigator.pop(context, widget.password);
       }
     }
@@ -85,54 +90,133 @@ class _AddPasswordModalState extends State<AddPasswordModal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.password == null ? 'Adicionar Senha' : 'Editar Senha'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+    final isEditing = widget.password != null;
+    final theme = Theme.of(context);
+
+    return Dialog(
+      insetPadding: const EdgeInsets.all(24),
+      backgroundColor: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'URL / Nome da Plataforma',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isEditing ? 'Editar Senha' : 'Adicionar Senha',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          isEditing
+                              ? Icons.edit_note_rounded
+                              : Icons.add_circle,
+                          color: theme.colorScheme.primary,
+                          size: 28,
+                        ),
+                        SizedBox(width: 5),
+                        IconButton(
+                          onPressed: Navigator.of(context).pop,
+                          icon: Icon(
+                            Icons.close,
+                            color: Colors.redAccent,
+                            size: 28,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                DropdownButtonFormField<PlatformType>(
+                  initialValue: _selectedPlatform,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(getPlatformIcon(_selectedPlatform)),
+                    labelText: 'Tipo de Plataforma',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
+                  items: PlatformType.values.map((type) {
+                    return DropdownMenuItem(
+                      value: type,
+                      child: Row(children: [Text(type.name.toCapitalized)]),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _selectedPlatform = value);
+                    }
+                  },
+                ),
+                const SizedBox(height: 14),
+
+                CustomFormField(
                   controller: _passwordUrlController,
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Entre com a URL ou nome do site'
-                      : null,
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Entre com a URL ou nome' : null,
+                  fieldType: FieldType.platform,
+                  label: 'Plataforma',
                 ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Email'),
+                const SizedBox(height: 14),
+
+                CustomFormField(
                   controller: _passwordEmailController,
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Entre com o email da senha'
-                      : null,
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Entre com o email' : null,
+                  fieldType: FieldType.email,
+                  label: 'Email',
                 ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Descrição'),
-                  controller: _passwordDescriptionController,
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Entre com uma descrição'
-                      : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Senha'),
+                const SizedBox(height: 14),
+
+                CustomFormField(
                   controller: _passwordController,
-                  obscureText: true,
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Entre com a senha'
-                      : null,
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Entre com a senha' : null,
+                  fieldType: FieldType.password,
+                  label: 'Senha',
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _savePassword,
-                  child: const Text("Salvar"),
+                const SizedBox(height: 14),
+
+                CustomFormField(
+                  controller: _passwordDescriptionController,
+                  fieldType: FieldType.description,
+                  label: 'Descrição',
+                ),
+                const SizedBox(height: 26),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: FilledButton.icon(
+                    onPressed: _savePassword,
+                    icon: const Icon(
+                      Icons.save_rounded,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      isEditing ? 'Atualizar' : 'Salvar',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -46,16 +46,29 @@ class DatabaseHelper {
     passwordDescription TEXT,
     createdAt DATE,
     userId INTEGER NOT NULL,
+    platformType TEXT NOT NULL,
 
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
     );
     ''');
   }
 
-  Future<List<PasswordModel>> getPasswordsByUserId() async {
+  Future<List<PasswordModel>> getPasswordsByUserId({String? filter}) async {
     final userId = await SessionManager.getCurrentUserId();
     Database db = await instance.database;
-    var passwords = await db.query(
+
+    if (filter != null && filter.isNotEmpty) {
+      final passwords = await db.query(
+        'passwords',
+        where: 'userId = ? AND platformName LIKE ?',
+        whereArgs: [userId, '%${filter.toLowerCase()}%'],
+      );
+      List<PasswordModel> passwordFilteredList = passwords.isNotEmpty
+          ? passwords.map((item) => PasswordModel.fromMap(item)).toList()
+          : [];
+      return passwordFilteredList;
+    }
+    final passwords = await db.query(
       'passwords',
       where: 'userId = ?',
       whereArgs: [userId],
@@ -118,7 +131,8 @@ class DatabaseHelper {
     UserModel? user = await getUserByEmail(email);
     if (user != null &&
         SecurityService.verifyAuthHash(email, password, user.userAuthData)) {
-      await SessionManager.saveCurrenteUser(user);
+      await SessionManager.saveCurrentUser(user);
+      await SecurityService.init();
       return user;
     }
     return null;

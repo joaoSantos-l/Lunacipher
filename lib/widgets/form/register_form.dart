@@ -52,6 +52,7 @@ class _RegisterForm extends State<RegisterForm> {
           ),
         );
       } else {
+        Navigator.of(context).pushReplacementNamed('/login');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Conta criada com sucesso!'),

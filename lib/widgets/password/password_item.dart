@@ -1,5 +1,8 @@
 import 'package:enciphered_app/models/password.dart';
 import 'package:enciphered_app/services/database_helper.dart';
+import 'package:enciphered_app/services/enum_mapper.dart';
+import 'package:enciphered_app/widgets/enums/platform_type.dart';
+import 'package:enciphered_app/widgets/password/password_details.dart';
 import 'package:enciphered_app/widgets/password/password_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,10 +71,18 @@ class _PassworditemState extends State<Passworditem> {
         child: Material(
           child: ListTile(
             minTileHeight: 80,
-            leading: const Icon(
-              Icons.text_snippet,
-              color: Color.fromARGB(179, 228, 204, 204),
-            ),
+            leading: widget.password.platformType == PlatformType.other
+                ? CircleAvatar(
+                    backgroundColor: Colors.blueGrey.shade700,
+                    child: Text(
+                      widget.password.platformName[0].toUpperCase(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  )
+                : Icon(
+                    getPlatformIcon(widget.password.platformType),
+                    color: Colors.white70,
+                  ),
             title: Text(
               widget.password.platformName,
               style: const TextStyle(
@@ -133,7 +144,10 @@ class _PassworditemState extends State<Passworditem> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.redAccent,
                             ),
-                            child: const Text('Excluir'),
+                            child: const Text(
+                              'Excluir',
+                              style: TextStyle(color: Colors.white),
+                            ),
                             onPressed: () => Navigator.pop(context, true),
                           ),
                         ],
@@ -151,7 +165,7 @@ class _PassworditemState extends State<Passworditem> {
               showDialog<PasswordModel>(
                 context: context,
                 builder: (context) =>
-                    AddPasswordModal(password: widget.password),
+                    PasswordDetailsModal(password: widget.password),
               );
             },
           ),

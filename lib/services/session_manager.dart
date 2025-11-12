@@ -8,7 +8,7 @@ class SessionManager {
   static const _keyUserEmail = 'user_email';
   static const _keyUsername = 'user_username';
 
-  static Future<void> saveCurrenteUser(UserModel user) async {
+  static Future<void> saveCurrentUser(UserModel user) async {
     await _storage.write(key: _keyUserId, value: user.id?.toString());
     await _storage.write(key: _keyUserEmail, value: user.email);
     await _storage.write(key: _keyUsername, value: user.username);
@@ -20,6 +20,8 @@ class SessionManager {
   }
 
   static Future<void> logout() async {
-    await _storage.deleteAll();
+    await _storage.delete(key: _keyUserId);
+    await _storage.delete(key: _keyUserEmail);
+    await _storage.delete(key: _keyUsername);
   }
 }

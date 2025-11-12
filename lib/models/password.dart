@@ -1,4 +1,5 @@
 import 'package:enciphered_app/services/security_service.dart';
+import 'package:enciphered_app/widgets/enums/platform_type.dart';
 
 class PasswordModel {
   int? id;
@@ -8,6 +9,7 @@ class PasswordModel {
   String platformPassword;
   String? passwordDescription;
   DateTime? createdAt;
+  PlatformType platformType;
 
   PasswordModel({
     this.id,
@@ -16,15 +18,16 @@ class PasswordModel {
     required this.platformName,
     required this.platformPassword,
     required this.userId,
+    this.platformType = PlatformType.other,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
   void encrypt(String inputPassword) {
-    platformPassword = SecurityService.encryptPassword(inputPassword);
+    platformPassword = SecurityService.encrypt(inputPassword);
   }
 
   String decrypt() {
-    return SecurityService.decryptPassword(platformPassword);
+    return SecurityService.decrypt(platformPassword);
   }
 
   factory PasswordModel.fromMap(Map<String, dynamic> json) => PasswordModel(
@@ -37,6 +40,10 @@ class PasswordModel {
         ? DateTime.parse(json['createdAt'])
         : null,
     userId: json['userId'],
+    platformType: PlatformType.values.firstWhere(
+      (e) => e.name == json['platformType'],
+      orElse: () => PlatformType.other,
+    ),
   );
 
   Map<String, dynamic> toMap() {
@@ -48,6 +55,7 @@ class PasswordModel {
       'createdAt': createdAt?.toIso8601String(),
       'platformName': platformName,
       'userId': userId,
+      'platformType': platformType.name,
     };
   }
 }
