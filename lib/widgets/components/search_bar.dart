@@ -31,6 +31,7 @@ class _SearchBarState extends State<SearchBarWidget> {
         children: [
           Expanded(
             child: TextField(
+              autofocus: false,
               controller: _searchController,
               onSubmitted: (_) => _performSearch(),
               decoration: InputDecoration(

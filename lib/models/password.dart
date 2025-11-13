@@ -18,7 +18,7 @@ class PasswordModel {
     required this.platformName,
     required this.platformPassword,
     required this.userId,
-    this.platformType = PlatformType.other,
+    this.platformType = PlatformType.outros,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -42,7 +42,7 @@ class PasswordModel {
     userId: json['userId'],
     platformType: PlatformType.values.firstWhere(
       (e) => e.name == json['platformType'],
-      orElse: () => PlatformType.other,
+      orElse: () => PlatformType.outros,
     ),
   );
 

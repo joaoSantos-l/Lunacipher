@@ -1,4 +1,3 @@
-import 'package:enciphered_app/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/form/login_form.dart';
@@ -69,12 +68,9 @@ class LoginScreen extends StatelessWidget {
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: GestureDetector(
                                   onTap: () {
-                                    Navigator.pushReplacement(
+                                    Navigator.pushReplacementNamed(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const RegisterScreen(),
-                                      ),
+                                      '/register',
                                     );
                                   },
                                   child: Text(

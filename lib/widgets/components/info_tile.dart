@@ -36,7 +36,7 @@ class _InfoTileState extends State<InfoTile> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+          color: theme.colorScheme.outlineVariant.withAlpha(3),
         ),
       ),
       child: Row(

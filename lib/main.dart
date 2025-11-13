@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:enciphered_app/views/dashboard_screen.dart';
+import 'package:enciphered_app/views/profile_screen.dart';
 import 'package:enciphered_app/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,35 +43,39 @@ class LunacipherApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Lunacipher',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0A0F1F),
-        textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF3A5BA0),
-          secondary: Color(0xFF4C7DD1),
-          secondaryContainer: Color.fromARGB(255, 68, 118, 203),
-          tertiaryContainer: Color.fromARGB(255, 15, 21, 42),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: const Color(0xFF1E2A4A),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Lunacipher',
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: const Color(0xFF0A0F1F),
+          textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
+          colorScheme: const ColorScheme.dark(
+            primary: Color(0xFF3A5BA0),
+            secondary: Color(0xFF4C7DD1),
+            secondaryContainer: Color.fromARGB(255, 68, 118, 203),
+            tertiaryContainer: Color.fromARGB(255, 15, 21, 42),
           ),
-          hintStyle: TextStyle(color: Colors.grey.shade400),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: const Color(0xFF1E2A4A),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+            hintStyle: TextStyle(color: Colors.grey.shade400),
+          ),
         ),
+        home: const LoginScreen(),
+        routes: {
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/dashboard': (context) => const DashboardScreen(),
+          '/profile': (context) => const ProfileScreen(),
+        },
       ),
-      home: const LoginScreen(),
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/dashboard': (context) => const DashboardScreen(),
-      },
     );
   }
 }

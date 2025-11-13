@@ -71,7 +71,7 @@ class _PassworditemState extends State<Passworditem> {
         child: Material(
           child: ListTile(
             minTileHeight: 80,
-            leading: widget.password.platformType == PlatformType.other
+            leading: widget.password.platformType == PlatformType.outros
                 ? CircleAvatar(
                     backgroundColor: Colors.blueGrey.shade700,
                     child: Text(

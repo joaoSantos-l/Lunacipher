@@ -1,1 +1,1 @@
-enum PlatformType { github, instagram, gmail, twitter, discord, steam, other }
+enum PlatformType { github, instagram, gmail, twitter, discord, steam, outros }

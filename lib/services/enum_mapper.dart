@@ -16,7 +16,7 @@ IconData getPlatformIcon(PlatformType type) {
       return FontAwesomeIcons.discord;
     case PlatformType.steam:
       return FontAwesomeIcons.steam;
-    case PlatformType.other:
+    case PlatformType.outros:
     // ignore: unreachable_switch_default
     default:
       return Icons.language;

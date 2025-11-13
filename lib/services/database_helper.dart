@@ -16,24 +16,33 @@ class DatabaseHelper {
 
   Future<Database> get database async => _database ??= await _initDatabase();
 
-  static const int _version = 1;
+  static const int _version = 3;
   static const String _dbName = "lunacipher_db.db";
 
   Future<Database> _initDatabase() async {
     Directory documentDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentDirectory.path, _dbName);
     print('🗄️ Database path resolved to: $path');
-    return openDatabase(path, onCreate: _createDb, version: _version);
+    return openDatabase(
+      path,
+      version: _version,
+      onCreate: _createDb,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.execute('DROP TABLE IF EXISTS users');
+        await db.execute('DROP TABLE IF EXISTS passwords');
+        await _createDb(db, newVersion);
+      },
+    );
   }
 
   Future _createDb(Database db, int version) async {
+    await db.execute('PRAGMA foreign_keys = ON;');
     await db.execute('''
-    PRAGMA foreign_keys = ON;
-
     CREATE TABLE users
     (id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
+    createdAt DATE,
     userAuthData TEXT NOT NULL UNIQUE);
     ''');
 
@@ -94,6 +103,15 @@ class DatabaseHelper {
     return await db.delete('passwords', where: 'id = ?', whereArgs: [id]);
   }
 
+  Future<int> removePasswordByUserId(int? userId) async {
+    Database db = await instance.database;
+    return await db.delete(
+      'passwords',
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+  }
+
   Future<int> updatePassword(PasswordModel password) async {
     Database db = await instance.database;
 
@@ -109,13 +127,21 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<PasswordModel>> getUser() async {
+  Future<UserModel?> getUserById() async {
     Database db = await instance.database;
-    var users = await db.query('passwords', orderBy: 'id DESC');
-    List<PasswordModel> userList = users.isNotEmpty
-        ? users.map((item) => PasswordModel.fromMap(item)).toList()
-        : [];
-    return userList;
+    final userId = await SessionManager.getCurrentUserId();
+
+    var user = await db.query(
+      'users',
+      where: 'id = ?',
+      whereArgs: [userId],
+      orderBy: 'id DESC',
+    );
+
+    if (user.isNotEmpty) {
+      return UserModel.fromMap(user.first);
+    }
+    return null;
   }
 
   Future<UserModel?> getUserByEmail(String email) async {
@@ -155,18 +181,24 @@ class DatabaseHelper {
     }
   }
 
-  Future<int> removeUser(int id) async {
+  Future<int> removeUser() async {
     Database db = await instance.database;
-    return await db.delete('users', where: 'id = ?', whereArgs: [id]);
+    final userId = await SessionManager.getCurrentUserId();
+    DatabaseHelper.instance.removePasswordByUserId(userId);
+    return await db.delete('users', where: 'id = ?', whereArgs: [userId]);
   }
 
-  Future<int> updateUser(UserModel user) async {
+  Future<int> updateUser(UserModel editedUser, String password) async {
+    editedUser.userAuthData = SecurityService.hashAuthData(
+      editedUser.email,
+      password,
+    );
     Database db = await instance.database;
     return await db.update(
       'users',
-      user.toMap(),
+      editedUser.toMap(),
       where: 'id = ?',
-      whereArgs: [user.id],
+      whereArgs: [editedUser.id],
     );
   }
 }

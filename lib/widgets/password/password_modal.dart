@@ -17,7 +17,7 @@ class AddPasswordModal extends StatefulWidget {
 
 class _AddPasswordModalState extends State<AddPasswordModal> {
   final _formKey = GlobalKey<FormState>();
-  PlatformType _selectedPlatform = PlatformType.other;
+  PlatformType _selectedPlatform = PlatformType.outros;
 
   final _passwordController = TextEditingController();
   final _passwordEmailController = TextEditingController();

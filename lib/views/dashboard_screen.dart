@@ -38,7 +38,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           Row(
             children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.person)),
+              IconButton(
+                onPressed: () =>
+                    Navigator.pushReplacementNamed(context, '/profile'),
+                icon: Icon(Icons.person),
+              ),
               SizedBox(width: 10),
               IconButton(
                 icon: const Icon(Icons.exit_to_app, color: Colors.redAccent),

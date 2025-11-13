@@ -24,4 +24,8 @@ class SessionManager {
     await _storage.delete(key: _keyUserEmail);
     await _storage.delete(key: _keyUsername);
   }
+
+  static Future<void> delete() async {
+    await _storage.deleteAll();
+  }
 }
